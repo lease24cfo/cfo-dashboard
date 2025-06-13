@@ -1,34 +1,48 @@
-
 import streamlit as st
 import pandas as pd
+import matplotlib.pyplot as plt
 
-# Sample structured P&L data (placeholder - replace with real data in production)
-data = {
+# Updated KPI Data
+kpi_data = {
     "Month": ["Jan 2025", "Feb 2025", "Mar 2025", "Apr 2025", "May 2025"],
-    "Revenue ($)": [21961.43, 16009.24, 18935.33, 17395.27, 18516.35],
-    "COGS ($)": [2861.41, 577.72, 674.78, 240.00, 938.90],
-    "Gross Profit ($)": [19100.02, 15431.52, 18260.55, 17155.27, 17577.45],
-    "Expenses ($)": [12828.86, 14937.08, 15788.58, 13816.38, 17510.48],
-    "Net Operating Income ($)": [5690.93, 494.44, 2471.97, 3338.89, 66.53],
-    "Other Expenses ($)": [-580.23, -705.34, -1523.47, -1000.00, -165.38],
-    "Net Income ($)": [6271.16, -210.90, 2995.44, 4338.89, -98.85]
+    "Revenue ($)": [21961.21, 16009.24, 18934.77, 17395.22, 18515.85],
+    "Net Income ($)": [6270.98, -209.55, 2993.88, 4338.07, -97.74],
+    "Revenue vs Goal (%)": [9.81, -19.96, -5.33, -13.02, -7.42],
+    "Net Income vs Goal (%)": [56.77, -105.24, -25.15, 8.45, -102.44],
+    "Revenue MoM Change (%)": [None, -27.11, 18.26, -8.13, 6.44],
+    "Net Income MoM Change (%)": [None, -103.34, 1528.64, 44.80, -102.25]
 }
-df = pd.DataFrame(data)
 
-# Set page config
-st.set_page_config(page_title="CrossFit Surf City | CFO Dashboard", layout="wide")
+kpi_df = pd.DataFrame(kpi_data)
 
-# Title
-st.title("📊 Monthly P&L Summary - CrossFit Surf City")
+# Header
+st.title("📊 CrossFit Surf City – Monthly KPI Dashboard")
+st.markdown("---")
 
-# Display the full P&L table
-st.dataframe(df.style.format({
-    "Revenue ($)": "${:,.2f}",
-    "COGS ($)": "${:,.2f}",
-    "Gross Profit ($)": "${:,.2f}",
-    "Expenses ($)": "${:,.2f}",
-    "Net Operating Income ($)": "${:,.2f}",
-    "Other Expenses ($)": "${:,.2f}",
-    "Net Income ($)": "${:,.2f}"
-}), use_container_width=True)
+# Visuals per month
+for i, row in kpi_df.iterrows():
+    st.subheader(f"📅 {row['Month']}")
 
+    rev_color = "green" if row['Revenue vs Goal (%)'] >= 0 else "red"
+    ni_color = "green" if row['Net Income vs Goal (%)'] >= 0 else "red"
+
+    st.markdown(f"**Revenue:** <span style='color:{rev_color}'>${row['Revenue ($)']:.2f} ({row['Revenue vs Goal (%)']:+.2f}%)</span>", unsafe_allow_html=True)
+    st.markdown(f"**Net Income:** <span style='color:{ni_color}'>${row['Net Income ($)']:.2f} ({row['Net Income vs Goal (%)']:+.2f}%)</span>", unsafe_allow_html=True)
+
+    st.markdown(f"**Revenue MoM Change:** {row['Revenue MoM Change (%)']:+.2f}%" if pd.notnull(row['Revenue MoM Change (%)']) else "")
+    st.markdown(f"**Net Income MoM Change:** {row['Net Income MoM Change (%)']:+.2f}%" if pd.notnull(row['Net Income MoM Change (%)']) else "")
+
+    # CFO Insight
+    rev_goal = row['Revenue vs Goal (%)']
+    ni_goal = row['Net Income vs Goal (%)']
+    if rev_goal > 0 and ni_goal > 0:
+        commentary = "✔ Strong month: both top-line and bottom-line exceeded expectations."
+    elif rev_goal > 0 and ni_goal < 0:
+        commentary = "⚠ Revenue hit goal, but margins may need attention — check costs."
+    elif rev_goal < 0 and ni_goal > 0:
+        commentary = "⚠ Solid profitability despite revenue miss — efficient ops or cost control."
+    else:
+        commentary = "❌ Underperformance — revisit pricing, expense control, or membership churn."
+
+    st.markdown(f"**🧠 CFO Insight:** {commentary}")
+    st.markdown("---")
