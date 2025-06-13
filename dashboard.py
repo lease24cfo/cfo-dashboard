@@ -1,57 +1,34 @@
+
 import streamlit as st
 import pandas as pd
 
-# 🚀 LIVE TEST HEADER
-st.markdown("# 🚀 Dashboard Live Test Successful")
-st.markdown("_If you're seeing this, the live connection is working!_")
-
-# Title & Date
-st.title("CrossFit Surf City – Financial KPI Dashboard")
-st.markdown("### Period: Jan–Apr 2025")
-st.divider()
-
-# Example KPI data
-months = ["Jan 2025", "Feb 2025", "Mar 2025", "Apr 2025"]
-kpis = {
-    "Revenue ($)": ["$83,716.83", "$84,296.96", "$81,535.59", "$17,395.00"],
-    "Goal: Revenue ($)": ["$90,000.00"] * 4,
-    "Revenue Variance (%)": ["-6.98%", "-6.34%", "-9.40%", "-80.67%"],
-    "Revenue Growth (%)": ["-1.51%", "0.69%", "-3.27%", "-78.66%"],
-    "Revenue YOY (%)": ["22.11%", "-5.94%", "5.01%", "-10.76%"],
-
-    "Expenses ($)": ["$61,723.34", "$69,135.39", "$63,933.43", "$13,056.00"],
-    "Goal: Expenses ($)": ["$75,000.00"] * 4,
-    "Expenses Variance (%)": ["-17.70%", "-7.82%", "-14.75%", "-82.59%"],
-    "Expenses YOY (%)": ["34.84%", "5.87%", "-10.61%", "-23.96%"],
-
-    "Net Income ($)": ["$21,993.49", "$15,161.57", "$17,602.16", "$4,339.00"],
-    "Goal: Net Income ($)": ["$15,000.00"] * 4,
-    "Net Income Variance (%)": ["46.62%", "1.08%", "17.35%", "-71.07%"],
-    "Net Income Margin (%)": ["26.27%", "17.98%", "21.59%", "24.94%"],
-    "Net Income YOY (%)": ["-1.19%", "-112.48%", "1292.31%", "85.70%"]
+# Sample structured P&L data (placeholder - replace with real data in production)
+data = {
+    "Month": ["Jan 2025", "Feb 2025", "Mar 2025", "Apr 2025", "May 2025"],
+    "Revenue ($)": [21961.43, 16009.24, 18935.33, 17395.27, 18516.35],
+    "COGS ($)": [2861.41, 577.72, 674.78, 240.00, 938.90],
+    "Gross Profit ($)": [19100.02, 15431.52, 18260.55, 17155.27, 17577.45],
+    "Expenses ($)": [12828.86, 14937.08, 15788.58, 13816.38, 17510.48],
+    "Net Operating Income ($)": [5690.93, 494.44, 2471.97, 3338.89, 66.53],
+    "Other Expenses ($)": [-580.23, -705.34, -1523.47, -1000.00, -165.38],
+    "Net Income ($)": [6271.16, -210.90, 2995.44, 4338.89, -98.85]
 }
+df = pd.DataFrame(data)
 
-# Dashboard
-for i, month in enumerate(months):
-    st.markdown(f"## 📅 {month}")
-    col1, col2, col3 = st.columns(3)
+# Set page config
+st.set_page_config(page_title="CrossFit Surf City | CFO Dashboard", layout="wide")
 
-    with col1:
-        st.metric("Revenue", kpis["Revenue ($)"][i], kpis["Revenue Growth (%)"][i])
-        st.caption(f"🎯 Goal: {kpis['Goal: Revenue ($)'][i]} | Variance: {kpis['Revenue Variance (%)'][i]}")
-        st.caption(f"📉 YOY: {kpis['Revenue YOY (%)'][i]}")
-        st.markdown("_Revenue is trending below goal despite YOY growth._")
+# Title
+st.title("📊 Monthly P&L Summary - CrossFit Surf City")
 
-    with col2:
-        st.metric("Expenses", kpis["Expenses ($)"][i])
-        st.caption(f"🎯 Goal: {kpis['Goal: Expenses ($)'][i]} | Variance: {kpis['Expenses Variance (%)'][i]}")
-        st.caption(f"📉 YOY: {kpis['Expenses YOY (%)'][i]}")
-        st.markdown("_Expenses remain controlled, significantly under budget._")
+# Display the full P&L table
+st.dataframe(df.style.format({
+    "Revenue ($)": "${:,.2f}",
+    "COGS ($)": "${:,.2f}",
+    "Gross Profit ($)": "${:,.2f}",
+    "Expenses ($)": "${:,.2f}",
+    "Net Operating Income ($)": "${:,.2f}",
+    "Other Expenses ($)": "${:,.2f}",
+    "Net Income ($)": "${:,.2f}"
+}), use_container_width=True)
 
-    with col3:
-        st.metric("Net Income", kpis["Net Income ($)"][i], kpis["Net Income Margin (%)"][i])
-        st.caption(f"🎯 Goal: {kpis['Goal: Net Income ($)'][i]} | Variance: {kpis['Net Income Variance (%)'][i]}")
-        st.caption(f"📉 YOY: {kpis['Net Income YOY (%)'][i]}")
-        st.markdown("_Profitability improved year-over-year, margin is strong._")
-
-    st.divider()
