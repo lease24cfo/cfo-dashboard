@@ -1,57 +1,82 @@
 import streamlit as st
 
-# Monthly data based on uploaded financials
+# Monthly KPI data
 months = [
-    {"month": "Jan 2025", "revenue": 21961.43, "net_income": 6270.38, "rev_goal": 20000, "ni_goal": 4000, "prev_revenue": None, "prev_income": None},
-    {"month": "Feb 2025", "revenue": 16009.24, "net_income": -210.93, "rev_goal": 20000, "ni_goal": 4000, "prev_revenue": 21961.21, "prev_income": 6270.38},
-    {"month": "Mar 2025", "revenue": 18935.33, "net_income": 2994.77, "rev_goal": 20000, "ni_goal": 4000, "prev_revenue": 16009.24, "prev_income": -210.93},
-    {"month": "Apr 2025", "revenue": 17395.27, "net_income": 4338.85, "rev_goal": 20000, "ni_goal": 4000, "prev_revenue": 18934.77, "prev_income": 2994.77},
-    {"month": "May 2025", "revenue": 18515.35, "net_income": -98.85, "rev_goal": 20000, "ni_goal": 4000, "prev_revenue": 17395.22, "prev_income": 4338.85},
+    {"Month": "January", "Revenue": 21961.43, "Expenses": 13364.44, "Net Income": 6271.16, "Revenue Goal": 20000, "Expense Goal": 14000, "Net Income Goal": 4000},
+    {"Month": "February", "Revenue": 16009.24, "Expenses": 16055.92, "Net Income": -210.93, "Revenue Goal": 20000, "Expense Goal": 14000, "Net Income Goal": 4000},
+    {"Month": "March", "Revenue": 18935.33, "Expenses": 15940.56, "Net Income": 2994.77, "Revenue Goal": 20000, "Expense Goal": 14000, "Net Income Goal": 4000},
+    {"Month": "April", "Revenue": 17395.27, "Expenses": 13056.42, "Net Income": 4338.85, "Revenue Goal": 20000, "Expense Goal": 14000, "Net Income Goal": 4000},
+    {"Month": "May", "Revenue": 18516.35, "Expenses": 18615.20, "Net Income": -98.85, "Revenue Goal": 20000, "Expense Goal": 14000, "Net Income Goal": 4000}
 ]
 
 st.set_page_config(layout="wide")
-st.title("📊 CrossFit Surf City – Monthly KPI Dashboard")
+st.title("📊 Monthly KPI Dashboard – Visual Layout")
 
-def format_pct(value):
-    color = "green" if value >= 0 else "red"
-    sign = "+" if value >= 0 else ""
-    return f":{color}[{sign}{value:.2f}%]"
+# Utility functions
+def pct_change(current, previous):
+    return ((current - previous) / previous) * 100 if previous != 0 else 0
 
-def generate_summary(income, goal):
-    if income >= goal:
-        return "✅ Strong performance"
-    elif income >= 0:
-        return "⚠️ Positive but below target"
-    else:
-        return "❌ Negative income – review urgently"
+def goal_diff(actual, goal):
+    return ((actual - goal) / goal) * 100 if goal != 0 else 0
 
-# Layout: 2 months per row
-for i in range(0, len(months), 2):
-    col1, col2 = st.columns(2)
+def label_color(pct):
+    return f":{'green' if pct >= 0 else 'red'}[{pct:+.2f}%]"
 
-    for col, idx in zip([col1, col2], [i, i+1]):
-        if idx >= len(months): continue
-        m = months[idx]
+# Initialize YTD totals
+ytd_rev = ytd_exp = ytd_ni = 0
+ytd_rev_goal = ytd_exp_goal = ytd_ni_goal = 0
 
-        # Goal %s
-        rev_goal_pct = ((m["revenue"] - m["rev_goal"]) / m["rev_goal"]) * 100
-        ni_goal_pct = ((m["net_income"] - m["ni_goal"]) / m["ni_goal"]) * 100
+for i, m in enumerate(months):
+    st.markdown(f"## 📌 {m['Month']}")
 
-        # MoM %
-        rev_mom = None if m["prev_revenue"] is None else ((m["revenue"] - m["prev_revenue"]) / m["prev_revenue"]) * 100
-        ni_mom = None if m["prev_income"] is None else ((m["net_income"] - m["prev_income"]) / abs(m["prev_income"] or 1)) * 100
+    prev = months[i-1] if i > 0 else m
+    ytd_rev += m['Revenue']
+    ytd_exp += m['Expenses']
+    ytd_ni += m['Net Income']
+    ytd_rev_goal += m['Revenue Goal']
+    ytd_exp_goal += m['Expense Goal']
+    ytd_ni_goal += m['Net Income Goal']
 
-        with col:
-            st.markdown(f"### 📅 {m['month']}")
-            st.metric("Revenue", f"${m['revenue']:,.2f}")
-            st.markdown(f"**% to Monthly Goal:** {format_pct(rev_goal_pct)}")
-            if rev_mom is not None:
-                st.markdown(f"**Revenue MoM Change:** {format_pct(rev_mom)}")
+    rev_goal_pct = goal_diff(m['Revenue'], m['Revenue Goal'])
+    exp_goal_pct = goal_diff(m['Expenses'], m['Expense Goal'])
+    ni_goal_pct = goal_diff(m['Net Income'], m['Net Income Goal'])
 
-            st.metric("Net Income", f"${m['net_income']:,.2f}")
-            st.markdown(f"**% to Monthly Goal:** {format_pct(ni_goal_pct)}")
-            if ni_mom is not None:
-                st.markdown(f"**Net Income MoM Change:** {format_pct(ni_mom)}")
+    rev_mom = pct_change(m['Revenue'], prev['Revenue']) if i > 0 else 0
+    exp_mom = pct_change(m['Expenses'], prev['Expenses']) if i > 0 else 0
+    ni_mom = pct_change(m['Net Income'], prev['Net Income']) if i > 0 else 0
 
-            st.markdown(f"**🧠 CFO Summary:** {generate_summary(m['net_income'], m['ni_goal'])}")
-            st.markdown("---")
+    ytd_rev_pct = goal_diff(ytd_rev, ytd_rev_goal)
+    ytd_exp_pct = goal_diff(ytd_exp, ytd_exp_goal)
+    ytd_ni_pct = goal_diff(ytd_ni, ytd_ni_goal)
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.metric("Revenue", f"${m['Revenue']:,.2f}")
+        st.markdown(f"Monthly Goal: {label_color(rev_goal_pct)}")
+        st.markdown(f"MoM Change: {label_color(rev_mom)}")
+        st.metric("YTD Revenue", f"${ytd_rev:,.2f}")
+        st.markdown(f"YTD Goal: {label_color(ytd_rev_pct)}")
+
+    with col2:
+        st.metric("Expenses", f"${m['Expenses']:,.2f}")
+        st.markdown(f"Monthly Goal: {label_color(exp_goal_pct)}")
+        st.markdown(f"MoM Change: {label_color(exp_mom)}")
+        st.metric("YTD Expenses", f"${ytd_exp:,.2f}")
+        st.markdown(f"YTD Goal: {label_color(ytd_exp_pct)}")
+
+    with col3:
+        st.metric("Net Income", f"${m['Net Income']:,.2f}")
+        st.markdown(f"Monthly Goal: {label_color(ni_goal_pct)}")
+        st.markdown(f"MoM Change: {label_color(ni_mom)}")
+        st.metric("YTD Net Income", f"${ytd_ni:,.2f}")
+        st.markdown(f"YTD Goal: {label_color(ytd_ni_pct)}")
+
+    rev_text = "📈 Revenue on pace." if ytd_rev_pct >= 0 else "⚠️ Revenue below goal."
+    exp_text = "✅ Expenses under control." if ytd_exp_pct <= 0 else "⚠️ Expenses over goal."
+    ni_text = "✅ Profit strong." if ytd_ni_pct >= 0 else "⚠️ Profit below expectations."
+
+    st.markdown(f"**CFO Insight – Revenue:** {rev_text}")
+    st.markdown(f"**CFO Insight – Expenses:** {exp_text}")
+    st.markdown(f"**CFO Insight – Net Income:** {ni_text}")
+    st.markdown("---")
