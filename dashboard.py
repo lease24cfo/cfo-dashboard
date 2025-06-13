@@ -2,11 +2,11 @@ import streamlit as st
 
 # Monthly data based on uploaded financials
 months = [
-    {"month": "Jan 2025", "revenue": 21961.21, "net_income": 6270.38, "rev_goal": 20000, "ni_goal": 4000, "prev_revenue": None, "prev_income": None},
+    {"month": "Jan 2025", "revenue": 21961.43, "net_income": 6270.38, "rev_goal": 20000, "ni_goal": 4000, "prev_revenue": None, "prev_income": None},
     {"month": "Feb 2025", "revenue": 16009.24, "net_income": -210.93, "rev_goal": 20000, "ni_goal": 4000, "prev_revenue": 21961.21, "prev_income": 6270.38},
-    {"month": "Mar 2025", "revenue": 18934.77, "net_income": 2994.77, "rev_goal": 20000, "ni_goal": 4000, "prev_revenue": 16009.24, "prev_income": -210.93},
-    {"month": "Apr 2025", "revenue": 17395.22, "net_income": 4338.85, "rev_goal": 20000, "ni_goal": 4000, "prev_revenue": 18934.77, "prev_income": 2994.77},
-    {"month": "May 2025", "revenue": 18515.85, "net_income": -98.85, "rev_goal": 20000, "ni_goal": 4000, "prev_revenue": 17395.22, "prev_income": 4338.85},
+    {"month": "Mar 2025", "revenue": 18935.33, "net_income": 2994.77, "rev_goal": 20000, "ni_goal": 4000, "prev_revenue": 16009.24, "prev_income": -210.93},
+    {"month": "Apr 2025", "revenue": 17395.27, "net_income": 4338.85, "rev_goal": 20000, "ni_goal": 4000, "prev_revenue": 18934.77, "prev_income": 2994.77},
+    {"month": "May 2025", "revenue": 18515.35, "net_income": -98.85, "rev_goal": 20000, "ni_goal": 4000, "prev_revenue": 17395.22, "prev_income": 4338.85},
 ]
 
 st.set_page_config(layout="wide")
