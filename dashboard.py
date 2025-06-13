@@ -1,76 +1,73 @@
 import streamlit as st
 
-# Monthly KPI data
+# Sample monthly data (replace with real values as needed)
 months = [
-    {"Month": "January", "Revenue": 21961.43, "Expenses": 13364.44, "Net Income": 6271.16, "Revenue Goal": 20000, "Expense Goal": 14000, "Net Income Goal": 4000},
-    {"Month": "February", "Revenue": 16009.24, "Expenses": 16055.92, "Net Income": -210.93, "Revenue Goal": 20000, "Expense Goal": 14000, "Net Income Goal": 4000},
-    {"Month": "March", "Revenue": 18935.33, "Expenses": 15940.56, "Net Income": 2994.77, "Revenue Goal": 20000, "Expense Goal": 14000, "Net Income Goal": 4000},
-    {"Month": "April", "Revenue": 17395.27, "Expenses": 13056.42, "Net Income": 4338.85, "Revenue Goal": 20000, "Expense Goal": 14000, "Net Income Goal": 4000},
-    {"Month": "May", "Revenue": 18516.35, "Expenses": 18615.20, "Net Income": -98.85, "Revenue Goal": 20000, "Expense Goal": 14000, "Net Income Goal": 4000}
+    {
+        "month": "Jan 2025",
+        "revenue": 21961.21,
+        "net_income": 6270.38,
+        "rev_mom": 38.91,
+        "ni_mom": 56.77,
+        "rev_goal_pct": 9.81,
+        "ni_goal_pct": 56.77,
+        "cfo_note": "✅ Strong month: both top-line and bottom-line exceeded expectations."
+    },
+    {
+        "month": "Feb 2025",
+        "revenue": 16009.24,
+        "net_income": -209.55,
+        "rev_mom": -27.11,
+        "ni_mom": -103.34,
+        "rev_goal_pct": -19.95,
+        "ni_goal_pct": -105.24,
+        "cfo_note": "❌ Underperformance — revisit pricing, expense control, or membership churn."
+    },
+    {
+        "month": "Mar 2025",
+        "revenue": 18934.77,
+        "net_income": 2993.88,
+        "rev_mom": 18.26,
+        "ni_mom": 1528.64,
+        "rev_goal_pct": -5.33,
+        "ni_goal_pct": -25.15,
+        "cfo_note": "❌ Underperformance — revisit pricing, expense control, or membership churn."
+    },
+    {
+        "month": "Apr 2025",
+        "revenue": 17395.22,
+        "net_income": 4338.07,
+        "rev_mom": -8.13,
+        "ni_mom": 44.80,
+        "rev_goal_pct": -13.02,
+        "ni_goal_pct": 8.45,
+        "cfo_note": "⚖️ Solid profitability despite revenue miss — efficient ops or cost control."
+    },
+    {
+        "month": "May 2025",
+        "revenue": 18515.85,
+        "net_income": -97.74,
+        "rev_mom": 6.44,
+        "ni_mom": -102.25,
+        "rev_goal_pct": -7.42,
+        "ni_goal_pct": -102.44,
+        "cfo_note": "❌ Underperformance — revisit pricing, expense control, or membership churn."
+    }
 ]
 
-st.set_page_config(layout="wide")
-st.title("📊 Monthly KPI Dashboard – Visual Layout")
+st.title("📊 CrossFit Surf City – Monthly KPI Dashboard")
 
-# Utility functions
-def pct_change(current, previous):
-    return ((current - previous) / previous) * 100 if previous != 0 else 0
+# Loop over months, two at a time
+for i in range(0, len(months), 2):
+    col1, col2 = st.columns(2)
+    for j, col in enumerate([col1, col2]):
+        if i + j < len(months):
+            m = months[i + j]
+            with col:
+                st.markdown(f"### 📅 {m['month']}")
+                st.markdown(f"**Revenue:** ${m['revenue']:,.2f} ({'🔺' if m['rev_goal_pct'] >= 0 else '🔻'} {abs(m['rev_goal_pct']):.2f}%)")
+                st.markdown(f"**Net Income:** ${m['net_income']:,.2f} ({'🔺' if m['ni_goal_pct'] >= 0 else '🔻'} {abs(m['ni_goal_pct']):.2f}%)")
+                st.markdown(f"**Revenue MoM Change:** {m['rev_mom']:+.2f}%")
+                st.markdown(f"**Net Income MoM Change:** {m['ni_mom']:+.2f}%")
+                st.markdown(f"**🧠 CFO Insight:** {m['cfo_note']}")
+                st.markdown("---")
 
-def goal_diff(actual, goal):
-    return ((actual - goal) / goal) * 100 if goal != 0 else 0
-
-def label_color(pct):
-    return f":{'green' if pct >= 0 else 'red'}[{pct:+.2f}%]"
-
-# Initialize YTD totals
-ytd_rev = ytd_exp = ytd_ni = 0
-ytd_rev_goal = ytd_exp_goal = ytd_ni_goal = 0
-
-for i, m in enumerate(months):
-    st.markdown(f"## 📌 {m['Month']}")
-
-    prev = months[i-1] if i > 0 else m
-    ytd_rev += m['Revenue']
-    ytd_exp += m['Expenses']
-    ytd_ni += m['Net Income']
-    ytd_rev_goal += m['Revenue Goal']
-    ytd_exp_goal += m['Expense Goal']
-    ytd_ni_goal += m['Net Income Goal']
-
-    rev_goal_pct = goal_diff(m['Revenue'], m['Revenue Goal'])
-    exp_goal_pct = goal_diff(m['Expenses'], m['Expense Goal'])
-    ni_goal_pct = goal_diff(m['Net Income'], m['Net Income Goal'])
-
-    rev_mom = pct_change(m['Revenue'], prev['Revenue']) if i > 0 else 0
-    exp_mom = pct_change(m['Expenses'], prev['Expenses']) if i > 0 else 0
-    ni_mom = pct_change(m['Net Income'], prev['Net Income']) if i > 0 else 0
-
-    ytd_rev_pct = goal_diff(ytd_rev, ytd_rev_goal)
-    ytd_exp_pct = goal_diff(ytd_exp, ytd_exp_goal)
-    ytd_ni_pct = goal_diff(ytd_ni, ytd_ni_goal)
-
-    col1, col2, col3 = st.columns(3)
-
-    with col1:
-        st.metric("Revenue", f"${m['Revenue']:,.2f}")
-        st.markdown(f"Monthly Goal: {label_color(rev_goal_pct)}")
-        st.markdown(f"MoM Change: {label_color(rev_mom)}")
-        st.metric("YTD Revenue", f"${ytd_rev:,.2f}")
-        st.markdown(f"YTD Goal: {label_color(ytd_rev_pct)}")
-
-    with col2:
-        st.metric("Expenses", f"${m['Expenses']:,.2f}")
-        st.markdown(f"Monthly Goal: {label_color(exp_goal_pct)}")
-        st.markdown(f"MoM Change: {label_color(exp_mom)}")
-        st.metric("YTD Expenses", f"${ytd_exp:,.2f}")
-        st.markdown(f"YTD Goal: {label_color(ytd_exp_pct)}")
-
-    with col3:
-        st.metric("Net Income", f"${m['Net Income']:,.2f}")
-        st.markdown(f"Monthly Goal: {label_color(ni_goal_pct)}")
-        st.markdown(f"MoM Change: {label_color(ni_mom)}")
-        st.metric("YTD Net Income", f"${ytd_ni:,.2f}")
-        st.markdown(f"YTD Goal: {label_color(ytd_ni_pct)}")
-
-    rev_text = "📈 Revenue on pace." if ytd_rev_pct >= 0 else "⚠️ Revenue below goal."
-    exp_text = "✅_
